@@ -60,15 +60,23 @@ const theme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
+          "& .MuiInputBase-input": {
+            color: "black", // Ensure text is visible
+          },
           "& .MuiOutlinedInput-root": {
-            transition: "border-color 0.3s ease, background-color 0.3s ease",
+            "& fieldset": {
+              borderColor: "rgba(0, 0, 0, 0.23)", // Ensure border is visible
+            },
             "&:hover fieldset": {
               borderColor: "#9bd7d8",
             },
             "&.Mui-focused fieldset": {
               borderColor: "#9bd7d8",
-              backgroundColor: "#e3f2fd",
+              backgroundColor: "rgba(155, 215, 216, 0.1)", // Light background when focused
             },
+          },
+          "& .MuiInputLabel-root": {
+            color: "rgba(0, 0, 0, 0.6)", // Ensure label is visible
           },
         },
       },
@@ -251,7 +259,6 @@ const LoginPage = () => {
                     id="email"
                     label="Email Address"
                     name="email"
-                    autoComplete="email"
                     autoFocus
                     onChange={handleInputChange}
                     error={!!emailError}
@@ -262,6 +269,10 @@ const LoginPage = () => {
                           <Email />
                         </InputAdornment>
                       ),
+                      style: { color: "black" }, // Ensure input text is black
+                    }}
+                    InputLabelProps={{
+                      style: { color: "rgba(0, 0, 0, 0.6)" }, // Ensure label is visible
                     }}
                   />
                   <AnimatedTextField
@@ -291,6 +302,10 @@ const LoginPage = () => {
                           </IconButton>
                         </InputAdornment>
                       ),
+                      style: { color: "black" }, // Ensure input text is black
+                    }}
+                    InputLabelProps={{
+                      style: { color: "rgba(0, 0, 0, 0.6)" }, // Ensure label is visible
                     }}
                   />
                   <AnimatedTypography variant="body2" sx={{ mt: 2 }}>
