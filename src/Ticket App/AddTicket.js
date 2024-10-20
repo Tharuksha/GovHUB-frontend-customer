@@ -14,6 +14,7 @@ import {
   Paper,
   CssBaseline,
   InputAdornment,
+  MenuItem,
 } from "@mui/material";
 import { createTheme, ThemeProvider, alpha } from "@mui/material/styles";
 import { motion } from "framer-motion";
@@ -26,6 +27,7 @@ import {
   AccessTime as AccessTimeIcon,
 } from "@mui/icons-material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import Logo from "../assets/logo.png";
@@ -110,9 +112,10 @@ const AddTicket = () => {
   const [operatingTime, setOperatingTime] = useState({});
   const [appointmentDetails, setAppointmentDetails] = useState({
     customerID: customer._id,
-    issueDescription: "",
+    appointmentReason: "",
     notes: "",
     appointmentDate: null,
+    appointmentTime: null,
     createdDate: new Date().toLocaleDateString(),
     status: "Pending",
     departmentID: departmentId,
@@ -136,13 +139,16 @@ const AddTicket = () => {
 
   const validate = () => {
     let tempErrors = {};
-    tempErrors.issueDescription = appointmentDetails.issueDescription
+    tempErrors.appointmentReason = appointmentDetails.appointmentReason
       ? ""
-      : "Issue description is required.";
+      : "Appointment reason is required.";
     tempErrors.notes = appointmentDetails.notes ? "" : "Notes are required.";
     tempErrors.appointmentDate = appointmentDetails.appointmentDate
       ? ""
       : "Appointment date is required.";
+    tempErrors.appointmentTime = appointmentDetails.appointmentTime
+      ? ""
+      : "Appointment time is required.";
 
     setErrors(tempErrors);
     return Object.values(tempErrors).every((x) => x === "");
@@ -156,7 +162,14 @@ const AddTicket = () => {
   const handleDateChange = (date) => {
     setAppointmentDetails({
       ...appointmentDetails,
-      appointmentDate: date.format("YYYY-MM-DD"),
+      appointmentDate: date,
+    });
+  };
+
+  const handleTimeChange = (time) => {
+    setAppointmentDetails({
+      ...appointmentDetails,
+      appointmentTime: time,
     });
   };
 
@@ -165,9 +178,25 @@ const AddTicket = () => {
 
     if (validate()) {
       try {
+        const combinedDateTime = moment(appointmentDetails.appointmentDate).set(
+          {
+            hour: appointmentDetails.appointmentTime.get("hour"),
+            minute: appointmentDetails.appointmentTime.get("minute"),
+            second: 0,
+            millisecond: 0,
+          }
+        );
+
+        const appointmentToSubmit = {
+          ...appointmentDetails,
+          appointmentDate: combinedDateTime.format("YYYY-MM-DD"),
+          appointmentTime: combinedDateTime.format("HH:mm:ss"),
+          appointmentDateTime: combinedDateTime.toISOString(),
+        };
+
         await axios.post(
           "http://localhost:8070/api/tickets",
-          appointmentDetails
+          appointmentToSubmit
         );
         toast.success("Appointment added successfully!");
         navigate("/ticketHistory");
@@ -323,23 +352,27 @@ const AddTicket = () => {
 
                   <form onSubmit={handleSubmit}>
                     <TextField
+                      select
                       fullWidth
-                      label="Issue"
-                      name="issueDescription"
+                      label="Appointment Reason"
+                      name="appointmentReason"
+                      value={appointmentDetails.appointmentReason}
                       onChange={handleInputChange}
                       required
                       variant="outlined"
                       sx={{ mb: 3 }}
-                      error={!!errors.issueDescription}
-                      helperText={errors.issueDescription}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <DescriptionIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
+                      error={!!errors.appointmentReason}
+                      helperText={errors.appointmentReason}
+                    >
+                      {departmentData.appointmentReasons &&
+                        departmentData.appointmentReasons.map(
+                          (reason, index) => (
+                            <MenuItem key={index} value={reason}>
+                              {reason}
+                            </MenuItem>
+                          )
+                        )}
+                    </TextField>
                     <TextField
                       fullWidth
                       label="Description"
@@ -355,11 +388,7 @@ const AddTicket = () => {
                     />
                     <DatePicker
                       label="Appointment Date"
-                      value={
-                        appointmentDetails.appointmentDate
-                          ? moment(appointmentDetails.appointmentDate)
-                          : null
-                      }
+                      value={appointmentDetails.appointmentDate}
                       onChange={handleDateChange}
                       renderInput={(params) => (
                         <TextField
@@ -380,7 +409,29 @@ const AddTicket = () => {
                         />
                       )}
                       disablePast
-                      inputFormat="DD/MM/YYYY"
+                    />
+                    <TimePicker
+                      label="Appointment Time"
+                      value={appointmentDetails.appointmentTime}
+                      onChange={handleTimeChange}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          fullWidth
+                          required
+                          error={!!errors.appointmentTime}
+                          helperText={errors.appointmentTime}
+                          sx={{ mb: 3 }}
+                          InputProps={{
+                            ...params.InputProps,
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <AccessTimeIcon />
+                              </InputAdornment>
+                            ),
+                          }}
+                        />
+                      )}
                     />
                     <Box
                       sx={{

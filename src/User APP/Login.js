@@ -17,7 +17,13 @@ import {
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useSpring, animated, config } from "react-spring";
-import { Visibility, VisibilityOff, Email, Lock } from "@mui/icons-material";
+import {
+  Visibility,
+  VisibilityOff,
+  Email,
+  Lock,
+  Phone,
+} from "@mui/icons-material";
 import Logo from "../assets/logo.png";
 
 // Theme setup
@@ -61,22 +67,22 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           "& .MuiInputBase-input": {
-            color: "black", // Ensure text is visible
+            color: "black",
           },
           "& .MuiOutlinedInput-root": {
             "& fieldset": {
-              borderColor: "rgba(0, 0, 0, 0.23)", // Ensure border is visible
+              borderColor: "rgba(0, 0, 0, 0.23)",
             },
             "&:hover fieldset": {
               borderColor: "#9bd7d8",
             },
             "&.Mui-focused fieldset": {
               borderColor: "#9bd7d8",
-              backgroundColor: "rgba(155, 215, 216, 0.1)", // Light background when focused
+              backgroundColor: "rgba(155, 215, 216, 0.1)",
             },
           },
           "& .MuiInputLabel-root": {
-            color: "rgba(0, 0, 0, 0.6)", // Ensure label is visible
+            color: "rgba(0, 0, 0, 0.6)",
           },
         },
       },
@@ -96,6 +102,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [showPhoneNumber, setShowPhoneNumber] = useState(false);
 
   const slideInForm = useSpring({
     from: { transform: "translateY(50px)", opacity: 0 },
@@ -157,6 +164,11 @@ const LoginPage = () => {
           (error.response?.data?.message || "Invalid credentials")
       );
     }
+  };
+
+  const handleCallInquiries = () => {
+    setShowPhoneNumber(true);
+    toast.info("Call for inquiries 0776505185");
   };
 
   return (
@@ -269,10 +281,10 @@ const LoginPage = () => {
                           <Email />
                         </InputAdornment>
                       ),
-                      style: { color: "black" }, // Ensure input text is black
+                      style: { color: "black" },
                     }}
                     InputLabelProps={{
-                      style: { color: "rgba(0, 0, 0, 0.6)" }, // Ensure label is visible
+                      style: { color: "rgba(0, 0, 0, 0.6)" },
                     }}
                   />
                   <AnimatedTextField
@@ -302,10 +314,10 @@ const LoginPage = () => {
                           </IconButton>
                         </InputAdornment>
                       ),
-                      style: { color: "black" }, // Ensure input text is black
+                      style: { color: "black" },
                     }}
                     InputLabelProps={{
-                      style: { color: "rgba(0, 0, 0, 0.6)" }, // Ensure label is visible
+                      style: { color: "rgba(0, 0, 0, 0.6)" },
                     }}
                   />
                   <AnimatedTypography variant="body2" sx={{ mt: 2 }}>
@@ -334,6 +346,27 @@ const LoginPage = () => {
               </AnimatedBox>
             </Grid>
           </Grid>
+          {/* Call For Inquiries Button */}
+          <Box sx={{ position: "fixed", right: 50, bottom: 20 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<Phone />}
+              onClick={handleCallInquiries}
+              sx={{
+                borderRadius: "20px",
+                padding: "10px 20px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                "&:hover": {
+                  boxShadow: "0 6px 12px rgba(0, 0, 0, 0.15)",
+                },
+                transition: "all 0.3s ease",
+                minWidth: showPhoneNumber ? "240px" : "auto",
+              }}
+            >
+              {showPhoneNumber ? "0776505185" : "Call For Inquiries"}
+            </Button>
+          </Box>
         </AnimatedContainer>
       </AnimatedBox>
       <ToastContainer />
