@@ -14,6 +14,10 @@ import {
   Paper,
   CssBaseline,
   InputAdornment,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { createTheme, ThemeProvider, alpha } from "@mui/material/styles";
 import { motion } from "framer-motion";
@@ -21,7 +25,6 @@ import {
   Dashboard as DashboardIcon,
   History as HistoryIcon,
   ExitToApp as LogoutIcon,
-  Description as DescriptionIcon,
   Event as EventIcon,
   AccessTime as AccessTimeIcon,
 } from "@mui/icons-material";
@@ -109,9 +112,10 @@ const AddTicket = () => {
   const departmentId = localStorage.getItem("departmentId");
   const [departmentData, setDepartmentData] = useState({});
   const [operatingTime, setOperatingTime] = useState({});
+  const [appointmentReasons, setAppointmentReasons] = useState([]);
   const [appointmentDetails, setAppointmentDetails] = useState({
     customerID: customer._id,
-    issueDescription: "",
+    appointmentReason: "",
     notes: "",
     appointmentDate: null,
     appointmentTime: null,
@@ -124,10 +128,16 @@ const AddTicket = () => {
 
   useEffect(() => {
     const getDepartmentDetails = async () => {
-      const res = await axios.get(
-        "http://localhost:8070/api/departments/" + departmentId
-      );
-      setDepartmentData(res.data);
+      try {
+        const res = await axios.get(
+          `http://localhost:8070/api/departments/${departmentId}`
+        );
+        setDepartmentData(res.data);
+        setAppointmentReasons(res.data.appointmentReasons || []);
+      } catch (error) {
+        console.error("Error fetching department details:", error);
+        toast.error("Failed to fetch department details");
+      }
     };
     getDepartmentDetails();
   }, [departmentId]);
@@ -138,9 +148,9 @@ const AddTicket = () => {
 
   const validate = () => {
     let tempErrors = {};
-    tempErrors.issueDescription = appointmentDetails.issueDescription
+    tempErrors.appointmentReason = appointmentDetails.appointmentReason
       ? ""
-      : "Issue description is required.";
+      : "Appointment reason is required.";
     tempErrors.notes = appointmentDetails.notes ? "" : "Notes are required.";
     tempErrors.appointmentDate = appointmentDetails.appointmentDate
       ? ""
@@ -350,24 +360,32 @@ const AddTicket = () => {
                   </Box>
 
                   <form onSubmit={handleSubmit}>
-                    <TextField
-                      fullWidth
-                      label="Issue"
-                      name="issueDescription"
-                      onChange={handleInputChange}
-                      required
-                      variant="outlined"
-                      sx={{ mb: 3 }}
-                      error={!!errors.issueDescription}
-                      helperText={errors.issueDescription}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <DescriptionIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
+                    <FormControl fullWidth sx={{ mb: 3 }}>
+                      <InputLabel id="appointment-reason-label">
+                        Appointment Reason
+                      </InputLabel>
+                      <Select
+                        labelId="appointment-reason-label"
+                        id="appointmentReason"
+                        name="appointmentReason"
+                        value={appointmentDetails.appointmentReason}
+                        onChange={handleInputChange}
+                        label="Appointment Reason"
+                        required
+                        error={!!errors.appointmentReason}
+                      >
+                        {appointmentReasons.map((reason, index) => (
+                          <MenuItem key={index} value={reason}>
+                            {reason}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {errors.appointmentReason && (
+                        <Typography color="error" variant="caption">
+                          {errors.appointmentReason}
+                        </Typography>
+                      )}
+                    </FormControl>
                     <TextField
                       fullWidth
                       label="Description"
