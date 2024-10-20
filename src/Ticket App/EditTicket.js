@@ -14,6 +14,10 @@ import {
   Paper,
   CssBaseline,
   InputAdornment,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { motion } from "framer-motion";
@@ -117,6 +121,7 @@ const EditTicket = () => {
     departmentID: localStorage.getItem("departmentId"),
   });
   const [errors, setErrors] = useState({});
+  const [appointmentReasons, setAppointmentReasons] = useState([]);
 
   useEffect(() => {
     const fetchTicketDetails = async () => {
@@ -125,6 +130,12 @@ const EditTicket = () => {
           `http://localhost:8070/api/tickets/${ticketID}`
         );
         setAppointmentDetails(res.data);
+
+        // Fetch department details to get appointment reasons
+        const deptRes = await axios.get(
+          `http://localhost:8070/api/departments/${res.data.departmentID}`
+        );
+        setAppointmentReasons(deptRes.data.appointmentReasons || []);
       } catch (error) {
         toast.error("Error fetching ticket details.");
         console.error("Error fetching ticket details:", error);
@@ -285,25 +296,32 @@ const EditTicket = () => {
                   </motion.div>
 
                   <form onSubmit={handleSubmit}>
-                    <TextField
-                      fullWidth
-                      label="Issue Description"
-                      name="issueDescription"
-                      onChange={handleInputChange}
-                      value={appointmentDetails.issueDescription}
-                      required
-                      variant="outlined"
-                      sx={{ mb: 3 }}
-                      error={!!errors.issueDescription}
-                      helperText={errors.issueDescription}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <DescriptionIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
+                    <FormControl fullWidth sx={{ mb: 3 }}>
+                      <InputLabel id="issue-description-label">
+                        Issue Description
+                      </InputLabel>
+                      <Select
+                        labelId="issue-description-label"
+                        id="issueDescription"
+                        name="issueDescription"
+                        value={appointmentDetails.issueDescription}
+                        onChange={handleInputChange}
+                        label="Issue Description"
+                        required
+                        error={!!errors.issueDescription}
+                      >
+                        {appointmentReasons.map((reason, index) => (
+                          <MenuItem key={index} value={reason}>
+                            {reason}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {errors.issueDescription && (
+                        <Typography color="error" variant="caption">
+                          {errors.issueDescription}
+                        </Typography>
+                      )}
+                    </FormControl>
                     <TextField
                       fullWidth
                       label="Notes"

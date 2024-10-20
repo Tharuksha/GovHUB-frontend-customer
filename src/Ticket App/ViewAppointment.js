@@ -107,7 +107,7 @@ const ViewAppointment = () => {
         setTicket(response.data);
         setLoading(false);
         fetchDepartmentName(response.data.departmentID);
-        if (response.data.status === "Solved") {
+        if (response.data.status === "Approved") {
           fetchStaff(response.data.staffID);
         }
       })
@@ -306,7 +306,7 @@ const ViewAppointment = () => {
                         secondary={ticket.status}
                       />
                     </ListItem>
-                    {ticket.status === "Solved" && (
+                    {ticket.status === "Approved" && (
                       <ListItem>
                         <ListItemIcon>
                           <Person />

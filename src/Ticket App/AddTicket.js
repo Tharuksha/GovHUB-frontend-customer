@@ -115,7 +115,7 @@ const AddTicket = () => {
   const [appointmentReasons, setAppointmentReasons] = useState([]);
   const [appointmentDetails, setAppointmentDetails] = useState({
     customerID: customer._id,
-    appointmentReason: "",
+    issueDescription: "",
     notes: "",
     appointmentDate: null,
     appointmentTime: null,
@@ -148,9 +148,9 @@ const AddTicket = () => {
 
   const validate = () => {
     let tempErrors = {};
-    tempErrors.appointmentReason = appointmentDetails.appointmentReason
+    tempErrors.issueDescription = appointmentDetails.issueDescription
       ? ""
-      : "Appointment reason is required.";
+      : "Issue description is required.";
     tempErrors.notes = appointmentDetails.notes ? "" : "Notes are required.";
     tempErrors.appointmentDate = appointmentDetails.appointmentDate
       ? ""
@@ -361,18 +361,18 @@ const AddTicket = () => {
 
                   <form onSubmit={handleSubmit}>
                     <FormControl fullWidth sx={{ mb: 3 }}>
-                      <InputLabel id="appointment-reason-label">
-                        Appointment Reason
+                      <InputLabel id="issue-description-label">
+                        Issue Description
                       </InputLabel>
                       <Select
-                        labelId="appointment-reason-label"
-                        id="appointmentReason"
-                        name="appointmentReason"
-                        value={appointmentDetails.appointmentReason}
+                        labelId="issue-description-label"
+                        id="issueDescription"
+                        name="issueDescription"
+                        value={appointmentDetails.issueDescription}
                         onChange={handleInputChange}
-                        label="Appointment Reason"
+                        label="Issue Description"
                         required
-                        error={!!errors.appointmentReason}
+                        error={!!errors.issueDescription}
                       >
                         {appointmentReasons.map((reason, index) => (
                           <MenuItem key={index} value={reason}>
@@ -380,15 +380,15 @@ const AddTicket = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      {errors.appointmentReason && (
+                      {errors.issueDescription && (
                         <Typography color="error" variant="caption">
-                          {errors.appointmentReason}
+                          {errors.issueDescription}
                         </Typography>
                       )}
                     </FormControl>
                     <TextField
                       fullWidth
-                      label="Description"
+                      label="Notes"
                       name="notes"
                       onChange={handleInputChange}
                       multiline
