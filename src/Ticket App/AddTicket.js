@@ -14,7 +14,6 @@ import {
   Paper,
   CssBaseline,
   InputAdornment,
-  MenuItem,
 } from "@mui/material";
 import { createTheme, ThemeProvider, alpha } from "@mui/material/styles";
 import { motion } from "framer-motion";
@@ -112,7 +111,7 @@ const AddTicket = () => {
   const [operatingTime, setOperatingTime] = useState({});
   const [appointmentDetails, setAppointmentDetails] = useState({
     customerID: customer._id,
-    appointmentReason: "",
+    issueDescription: "",
     notes: "",
     appointmentDate: null,
     appointmentTime: null,
@@ -139,9 +138,9 @@ const AddTicket = () => {
 
   const validate = () => {
     let tempErrors = {};
-    tempErrors.appointmentReason = appointmentDetails.appointmentReason
+    tempErrors.issueDescription = appointmentDetails.issueDescription
       ? ""
-      : "Appointment reason is required.";
+      : "Issue description is required.";
     tempErrors.notes = appointmentDetails.notes ? "" : "Notes are required.";
     tempErrors.appointmentDate = appointmentDetails.appointmentDate
       ? ""
@@ -352,27 +351,23 @@ const AddTicket = () => {
 
                   <form onSubmit={handleSubmit}>
                     <TextField
-                      select
                       fullWidth
-                      label="Appointment Reason"
-                      name="appointmentReason"
-                      value={appointmentDetails.appointmentReason}
+                      label="Issue"
+                      name="issueDescription"
                       onChange={handleInputChange}
                       required
                       variant="outlined"
                       sx={{ mb: 3 }}
-                      error={!!errors.appointmentReason}
-                      helperText={errors.appointmentReason}
-                    >
-                      {departmentData.appointmentReasons &&
-                        departmentData.appointmentReasons.map(
-                          (reason, index) => (
-                            <MenuItem key={index} value={reason}>
-                              {reason}
-                            </MenuItem>
-                          )
-                        )}
-                    </TextField>
+                      error={!!errors.issueDescription}
+                      helperText={errors.issueDescription}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <DescriptionIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
                     <TextField
                       fullWidth
                       label="Description"
