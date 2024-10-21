@@ -134,7 +134,9 @@ const Register = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await axios.get("http://localhost:8070/api/customers");
+        const res = await axios.get(
+          "https://govhub-backend-6375764a4f5c.herokuapp.com/api/customers"
+        );
         setAllCustomers(res.data);
       } catch (error) {
         toast.error("Failed to fetch customers");
@@ -227,12 +229,12 @@ const Register = () => {
       setLoading(true);
       try {
         const res = await axios.post(
-          "http://localhost:8070/api/customers",
+          "https://govhub-backend-6375764a4f5c.herokuapp.com/api/customers",
           dataToSubmit
         );
         const email = dataToSubmit.emailAddress;
         const customerRes = await axios.get(
-          `http://localhost:8070/api/customers/email/${email}`
+          `https://govhub-backend-6375764a4f5c.herokuapp.com/api/customers/email/${email}`
         );
         const customerData = customerRes.data;
         localStorage.setItem("customer", JSON.stringify(customerData));

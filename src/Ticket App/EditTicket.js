@@ -127,13 +127,13 @@ const EditTicket = () => {
     const fetchTicketDetails = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8070/api/tickets/${ticketID}`
+          `https://govhub-backend-6375764a4f5c.herokuapp.com/api/tickets/${ticketID}`
         );
         setAppointmentDetails(res.data);
 
         // Fetch department details to get appointment reasons
         const deptRes = await axios.get(
-          `http://localhost:8070/api/departments/${res.data.departmentID}`
+          `https://govhub-backend-6375764a4f5c.herokuapp.com/api/departments/${res.data.departmentID}`
         );
         setAppointmentReasons(deptRes.data.appointmentReasons || []);
       } catch (error) {
@@ -177,7 +177,7 @@ const EditTicket = () => {
     if (validate()) {
       try {
         await axios.put(
-          `http://localhost:8070/api/tickets/${ticketID}`,
+          `https://govhub-backend-6375764a4f5c.herokuapp.com/api/tickets/${ticketID}`,
           appointmentDetails
         );
         toast.success("Appointment updated successfully!");

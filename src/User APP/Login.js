@@ -145,12 +145,12 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:8070/api/customers/login",
+        "https://govhub-backend-6375764a4f5c.herokuapp.com/api/customers/login",
         { email, password }
       );
       const { token } = res.data;
       const customerRes = await axios.get(
-        `http://localhost:8070/api/customers/email/${email}`
+        `https://govhub-backend-6375764a4f5c.herokuapp.com/api/customers/email/${email}`
       );
       localStorage.setItem("token", token);
       localStorage.setItem("customer", JSON.stringify(customerRes.data));

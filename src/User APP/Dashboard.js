@@ -107,7 +107,9 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:8070/api/departments");
+      const response = await axios.get(
+        "https://govhub-backend-6375764a4f5c.herokuapp.com/api/departments"
+      );
       setData(response.data);
       setFilteredData(response.data);
     } catch (error) {

@@ -130,7 +130,7 @@ const AddTicket = () => {
     const getDepartmentDetails = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8070/api/departments/${departmentId}`
+          `https://govhub-backend-6375764a4f5c.herokuapp.com/api/departments/${departmentId}`
         );
         setDepartmentData(res.data);
         setAppointmentReasons(res.data.appointmentReasons || []);
@@ -204,7 +204,7 @@ const AddTicket = () => {
         };
 
         await axios.post(
-          "http://localhost:8070/api/tickets",
+          "https://govhub-backend-6375764a4f5c.herokuapp.com/api/tickets",
           appointmentToSubmit
         );
         toast.success("Appointment added successfully!");
