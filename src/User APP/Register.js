@@ -34,8 +34,7 @@ import {
   CalendarToday,
   CardMembership,
 } from "@mui/icons-material";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import Logo from "../assets/logo.png";
@@ -80,15 +79,23 @@ const theme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
+          "& .MuiInputBase-input": {
+            color: "black", // Ensure text is visible
+          },
           "& .MuiOutlinedInput-root": {
-            transition: "border-color 0.3s ease, background-color 0.3s ease",
+            "& fieldset": {
+              borderColor: "rgba(0, 0, 0, 0.23)", // Ensure border is visible
+            },
             "&:hover fieldset": {
               borderColor: "#9bd7d8",
             },
             "&.Mui-focused fieldset": {
               borderColor: "#9bd7d8",
-              backgroundColor: "#e3f2fd",
+              backgroundColor: "rgba(155, 215, 216, 0.1)", // Light background when focused
             },
+          },
+          "& .MuiInputLabel-root": {
+            color: "rgba(0, 0, 0, 0.6)", // Ensure label is visible
           },
         },
       },
@@ -205,15 +212,12 @@ const Register = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     const error = validateField(name, value);
-    setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
-    setCustomerDetails((prevDetails) => ({ ...prevDetails, [name]: value }));
+    setErrors({ ...errors, [name]: error });
+    setCustomerDetails({ ...customerDetails, [name]: value });
   };
 
   const handleDateChange = (date) => {
-    setCustomerDetails((prevDetails) => ({
-      ...prevDetails,
-      dateOfBirth: date,
-    }));
+    setCustomerDetails({ ...customerDetails, dateOfBirth: date });
   };
 
   const handleSubmit = async (e) => {
@@ -257,161 +261,171 @@ const Register = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <AnimatedBox
-          style={slideInForm}
-          sx={{
-            minHeight: "100vh",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "linear-gradient(135deg, #cce6e7, #9bd7d8)",
-            backgroundSize: "200% 200%",
-            animation: "gradientShift 6s ease infinite",
-            "@keyframes gradientShift": {
-              "0%": { backgroundPosition: "0% 50%" },
-              "50%": { backgroundPosition: "100% 50%" },
-              "100%": { backgroundPosition: "0% 50%" },
-            },
-            py: 4,
-          }}
-        >
-          <Container maxWidth="lg">
-            <AnimatedPaper
-              elevation={6}
+      <AnimatedBox
+        style={slideInForm}
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "linear-gradient(135deg, #cce6e7, #9bd7d8)",
+          backgroundSize: "200% 200%",
+          animation: "gradientShift 6s ease infinite",
+          "@keyframes gradientShift": {
+            "0%": { backgroundPosition: "0% 50%" },
+            "50%": { backgroundPosition: "100% 50%" },
+            "100%": { backgroundPosition: "0% 50%" },
+          },
+          py: 4,
+        }}
+      >
+        <Container maxWidth="lg">
+          <AnimatedPaper
+            elevation={6}
+            sx={{
+              borderRadius: 4,
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+            }}
+          >
+            <Box
               sx={{
-                borderRadius: 4,
-                overflow: "hidden",
+                flex: { xs: "1", md: "0 0 40%" },
                 display: "flex",
-                flexDirection: { xs: "column", md: "row" },
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                p: 4,
+                backgroundColor: "rgba(255, 255, 255, 0.9)",
               }}
             >
-              <Box
+              <animated.img
+                src={Logo}
+                alt="Gov Hub Logo"
+                style={{
+                  ...bounceLogo,
+                  width: "140px",
+                  height: "auto",
+                  marginBottom: "24px",
+                }}
+              />
+              <AnimatedTypography
+                variant="h3"
                 sx={{
-                  flex: { xs: "1", md: "0 0 40%" },
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  p: 4,
-                  backgroundColor: "rgba(255, 255, 255, 0.9)",
+                  color: "#313131",
+                  fontWeight: "bold",
+                  mb: 2,
+                  textAlign: "center",
                 }}
               >
-                <animated.img
-                  src={Logo}
-                  alt="Gov Hub Logo"
-                  style={{
-                    ...bounceLogo,
-                    width: "140px",
-                    height: "auto",
-                    marginBottom: "24px",
-                  }}
-                />
-                <AnimatedTypography
-                  variant="h3"
-                  sx={{
-                    color: "#313131",
-                    fontWeight: "bold",
-                    mb: 2,
-                    textAlign: "center",
-                  }}
-                >
-                  Gov Hub
-                </AnimatedTypography>
-                <AnimatedTypography
-                  variant="h5"
-                  sx={{
-                    color: "#313131",
-                    fontWeight: "400",
-                    textAlign: "center",
-                  }}
-                >
-                  Appointment Scheduling System
-                </AnimatedTypography>
-              </Box>
-              <Box
+                Gov Hub
+              </AnimatedTypography>
+              <AnimatedTypography
+                variant="h5"
                 sx={{
-                  flex: { xs: "1", md: "0 0 60%" },
-                  backgroundColor: "white",
-                  p: 4,
+                  color: "#313131",
+                  fontWeight: "400",
+                  textAlign: "center",
                 }}
               >
-                <AnimatedTypography
-                  component="h1"
-                  variant="h4"
-                  sx={{ mb: 3, fontWeight: 600, textAlign: "center" }}
-                >
-                  Create an Account
-                </AnimatedTypography>
-                <Box
-                  component="form"
-                  onSubmit={handleSubmit}
-                  noValidate
-                  sx={{ mt: 3 }}
-                >
-                  <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label="NIC"
-                        name="NIC"
-                        value={customerDetails.NIC}
-                        onChange={handleInputChange}
-                        required
-                        error={!!errors.NIC}
-                        helperText={errors.NIC}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <CardMembership />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="First Name"
-                        name="firstName"
-                        value={customerDetails.firstName}
-                        onChange={handleInputChange}
-                        required
-                        error={!!errors.firstName}
-                        helperText={errors.firstName}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <Person />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Last Name"
-                        name="lastName"
-                        value={customerDetails.lastName}
-                        onChange={handleInputChange}
-                        required
-                        error={!!errors.lastName}
-                        helperText={errors.lastName}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <Person />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
+                Appointment Scheduling System
+              </AnimatedTypography>
+            </Box>
+            <Box
+              sx={{
+                flex: { xs: "1", md: "0 0 60%" },
+                backgroundColor: "white",
+                p: 4,
+              }}
+            >
+              <AnimatedTypography
+                component="h1"
+                variant="h4"
+                sx={{ mb: 3, fontWeight: 600, textAlign: "center" }}
+              >
+                Create an Account
+              </AnimatedTypography>
+              <Box
+                component="form"
+                onSubmit={handleSubmit}
+                noValidate
+                sx={{ mt: 3 }}
+              >
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="NIC"
+                      name="NIC"
+                      onChange={handleInputChange}
+                      required
+                      error={!!errors.NIC}
+                      helperText={errors.NIC}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <CardMembership />
+                          </InputAdornment>
+                        ),
+                        style: { color: "black" },
+                      }}
+                      InputLabelProps={{
+                        style: { color: "rgba(0, 0, 0, 0.6)" },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="First Name"
+                      name="firstName"
+                      onChange={handleInputChange}
+                      required
+                      error={!!errors.firstName}
+                      helperText={errors.firstName}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Person />
+                          </InputAdornment>
+                        ),
+                        style: { color: "black" },
+                      }}
+                      InputLabelProps={{
+                        style: { color: "rgba(0, 0, 0, 0.6)" },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Last Name"
+                      name="lastName"
+                      onChange={handleInputChange}
+                      required
+                      error={!!errors.lastName}
+                      helperText={errors.lastName}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Person />
+                          </InputAdornment>
+                        ),
+                        style: { color: "black" },
+                      }}
+                      InputLabelProps={{
+                        style: { color: "rgba(0, 0, 0, 0.6)" },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DatePicker
                         label="Date of Birth"
                         value={customerDetails.dateOfBirth}
                         onChange={handleDateChange}
+                        maxDate={dayjs()}
                         renderInput={(params) => (
                           <TextField
                             {...params}
@@ -425,159 +439,175 @@ const Register = () => {
                                   <CalendarToday />
                                 </InputAdornment>
                               ),
+                              style: { color: "black" },
+                            }}
+                            InputLabelProps={{
+                              style: { color: "rgba(0, 0, 0, 0.6)" },
                             }}
                           />
                         )}
                       />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <FormControl component="fieldset" required>
-                        <FormLabel component="legend">Gender</FormLabel>
-                        <RadioGroup
-                          row
-                          name="gender"
-                          value={customerDetails.gender}
-                          onChange={handleInputChange}
-                        >
-                          <FormControlLabel
-                            value="male"
-                            control={<Radio />}
-                            label="Male"
-                          />
-                          <FormControlLabel
-                            value="female"
-                            control={<Radio />}
-                            label="Female"
-                          />
-                        </RadioGroup>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label="Phone Number"
-                        name="phoneNumber"
-                        value={customerDetails.phoneNumber}
-                        onChange={handleInputChange}
-                        required
-                        error={!!errors.phoneNumber}
-                        helperText={errors.phoneNumber}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <Phone />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label="Email Address"
-                        name="emailAddress"
-                        value={customerDetails.emailAddress}
-                        onChange={handleInputChange}
-                        required
-                        error={!!errors.emailAddress}
-                        helperText={errors.emailAddress}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <Email />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label="Address"
-                        name="address"
-                        value={customerDetails.address}
-                        onChange={handleInputChange}
-                        required
-                        error={!!errors.address}
-                        helperText={errors.address}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <Home />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label="Password"
-                        name="password"
-                        type={showPassword ? "text" : "password"}
-                        value={customerDetails.password}
-                        onChange={handleInputChange}
-                        required
-                        error={!!errors.password}
-                        helperText={errors.password}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <Lock />
-                            </InputAdornment>
-                          ),
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <IconButton
-                                aria-label="toggle password visibility"
-                                onClick={() => setShowPassword(!showPassword)}
-                                edge="end"
-                              >
-                                {showPassword ? (
-                                  <VisibilityOff />
-                                ) : (
-                                  <Visibility />
-                                )}
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
+                    </LocalizationProvider>
                   </Grid>
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 3, mb: 2, py: 1.5 }}
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <CircularProgress size={24} sx={{ color: "white" }} />
-                    ) : (
-                      "Register"
-                    )}
-                  </Button>
-                  <Grid container justifyContent="flex-end">
-                    <Grid item>
-                      <Typography variant="body2">
-                        Already have an account?{" "}
-                        <Button
-                          color="primary"
-                          onClick={() => navigate("/login")}
-                        >
-                          Sign in
-                        </Button>
-                      </Typography>
-                    </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl component="fieldset" required>
+                      <FormLabel component="legend">Gender</FormLabel>
+                      <RadioGroup
+                        row
+                        name="gender"
+                        value={customerDetails.gender}
+                        onChange={handleInputChange}
+                      >
+                        <FormControlLabel
+                          value="male"
+                          control={<Radio />}
+                          label="Male"
+                        />
+                        <FormControlLabel
+                          value="female"
+                          control={<Radio />}
+                          label="Female"
+                        />
+                      </RadioGroup>
+                    </FormControl>
                   </Grid>
-                </Box>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Phone Number"
+                      name="phoneNumber"
+                      onChange={handleInputChange}
+                      required
+                      error={!!errors.phoneNumber}
+                      helperText={errors.phoneNumber}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Phone />
+                          </InputAdornment>
+                        ),
+                        style: { color: "black" },
+                      }}
+                      InputLabelProps={{
+                        style: { color: "rgba(0, 0, 0, 0.6)" },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Email Address"
+                      name="emailAddress"
+                      onChange={handleInputChange}
+                      required
+                      error={!!errors.emailAddress}
+                      helperText={errors.emailAddress}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Email />
+                          </InputAdornment>
+                        ),
+                        style: { color: "black" },
+                      }}
+                      InputLabelProps={{
+                        style: { color: "rgba(0, 0, 0, 0.6)" },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Address"
+                      name="address"
+                      onChange={handleInputChange}
+                      required
+                      error={!!errors.address}
+                      helperText={errors.address}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Home />
+                          </InputAdornment>
+                        ),
+                        style: { color: "black" },
+                      }}
+                      InputLabelProps={{
+                        style: { color: "rgba(0, 0, 0, 0.6)" },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      onChange={handleInputChange}
+                      required
+                      error={!!errors.password}
+                      helperText={errors.password}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Lock />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={() => setShowPassword(!showPassword)}
+                              edge="end"
+                            >
+                              {showPassword ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                        style: { color: "black" },
+                      }}
+                      InputLabelProps={{
+                        style: { color: "rgba(0, 0, 0, 0.6)" },
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2, py: 1.5 }}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <CircularProgress size={24} sx={{ color: "white" }} />
+                  ) : (
+                    "Register"
+                  )}
+                </Button>
+                <Grid container justifyContent="flex-end">
+                  <Grid item>
+                    <Typography variant="body2">
+                      Already have an account?{" "}
+                      <Button
+                        color="primary"
+                        onClick={() => navigate("/login")}
+                      >
+                        Sign in
+                      </Button>
+                    </Typography>
+                  </Grid>
+                </Grid>
               </Box>
-            </AnimatedPaper>
-          </Container>
-        </AnimatedBox>
-        <ToastContainer />
-      </LocalizationProvider>
+            </Box>
+          </AnimatedPaper>
+        </Container>
+      </AnimatedBox>
+      <ToastContainer />
     </ThemeProvider>
   );
 };
