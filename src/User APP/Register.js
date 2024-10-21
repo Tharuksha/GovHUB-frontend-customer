@@ -205,11 +205,17 @@ const Register = () => {
     const { name, value } = e.target;
     const error = validateField(name, value);
     setErrors({ ...errors, [name]: error });
-    setCustomerDetails({ ...customerDetails, [name]: value });
+    setCustomerDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: value,
+    }));
   };
 
   const handleDateChange = (date) => {
-    setCustomerDetails({ ...customerDetails, dateOfBirth: date });
+    setCustomerDetails((prevDetails) => ({
+      ...prevDetails,
+      dateOfBirth: date,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -350,6 +356,7 @@ const Register = () => {
                       fullWidth
                       label="NIC"
                       name="NIC"
+                      value={customerDetails.NIC}
                       onChange={handleInputChange}
                       required
                       error={!!errors.NIC}
@@ -368,6 +375,7 @@ const Register = () => {
                       fullWidth
                       label="First Name"
                       name="firstName"
+                      value={customerDetails.firstName}
                       onChange={handleInputChange}
                       required
                       error={!!errors.firstName}
@@ -386,6 +394,7 @@ const Register = () => {
                       fullWidth
                       label="Last Name"
                       name="lastName"
+                      value={customerDetails.lastName}
                       onChange={handleInputChange}
                       required
                       error={!!errors.lastName}
@@ -452,6 +461,7 @@ const Register = () => {
                       fullWidth
                       label="Phone Number"
                       name="phoneNumber"
+                      value={customerDetails.phoneNumber}
                       onChange={handleInputChange}
                       required
                       error={!!errors.phoneNumber}
@@ -470,6 +480,7 @@ const Register = () => {
                       fullWidth
                       label="Email Address"
                       name="emailAddress"
+                      value={customerDetails.emailAddress}
                       onChange={handleInputChange}
                       required
                       error={!!errors.emailAddress}
@@ -488,6 +499,7 @@ const Register = () => {
                       fullWidth
                       label="Address"
                       name="address"
+                      value={customerDetails.address}
                       onChange={handleInputChange}
                       required
                       error={!!errors.address}
@@ -507,6 +519,7 @@ const Register = () => {
                       label="Password"
                       name="password"
                       type={showPassword ? "text" : "password"}
+                      value={customerDetails.password}
                       onChange={handleInputChange}
                       required
                       error={!!errors.password}
