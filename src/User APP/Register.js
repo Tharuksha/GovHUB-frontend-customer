@@ -39,7 +39,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import Logo from "../assets/logo.png";
 
-// Theme setup
+// Theme setup (unchanged)
 const theme = createTheme({
   palette: {
     primary: {
@@ -247,11 +247,16 @@ const Register = () => {
         const customerData = customerRes.data;
         localStorage.setItem("customer", JSON.stringify(customerData));
         setLoading(false);
-        toast.success("Registration successful");
+        toast.success(
+          "Registration successful. Please check your email for confirmation."
+        );
         navigate("/login");
       } catch (error) {
         setLoading(false);
-        toast.error("Registration failed");
+        toast.error(
+          "Registration failed: " +
+            (error.response?.data?.message || "An error occurred")
+        );
       }
     } else {
       toast.error("Please correct the errors before submitting.");
