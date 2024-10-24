@@ -18,6 +18,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  CircularProgress,
 } from "@mui/material";
 import { createTheme, ThemeProvider, alpha } from "@mui/material/styles";
 import { motion } from "framer-motion";
@@ -113,6 +114,7 @@ const AddTicket = () => {
   const [departmentData, setDepartmentData] = useState({});
   const [operatingTime, setOperatingTime] = useState({});
   const [appointmentReasons, setAppointmentReasons] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [appointmentDetails, setAppointmentDetails] = useState({
     customerID: customer._id,
     issueDescription: "",
@@ -186,7 +188,9 @@ const AddTicket = () => {
     e.preventDefault();
 
     if (validate()) {
+      setIsLoading(true);
       try {
+        // Format the date and time for the appointment
         const combinedDateTime = moment(appointmentDetails.appointmentDate).set(
           {
             hour: appointmentDetails.appointmentTime.get("hour"),
@@ -203,15 +207,45 @@ const AddTicket = () => {
           appointmentDateTime: combinedDateTime.toISOString(),
         };
 
-        await axios.post(
+        // Create the appointment
+        const response = await axios.post(
           "https://govhub-backend-6375764a4f5c.herokuapp.com/api/tickets",
           appointmentToSubmit
         );
-        toast.success("Appointment added successfully!");
+
+        // Prepare email details
+        const emailDetails = {
+          to: customer.emailAddress,
+          appointmentDetails: {
+            date: combinedDateTime.format("MMMM D, YYYY"),
+            time: combinedDateTime.format("h:mm A"),
+            department: departmentData.departmentName,
+            purpose: appointmentDetails.issueDescription,
+          },
+        };
+
+        // Send confirmation email
+        try {
+          await axios.post(
+            "https://govhub-backend-6375764a4f5c.herokuapp.com/api/email/appointment-confirmation",
+            emailDetails
+          );
+          toast.success(
+            "Appointment added successfully and confirmation email sent!"
+          );
+        } catch (emailError) {
+          console.error("Error sending confirmation email:", emailError);
+          toast.warning(
+            "Appointment added but confirmation email could not be sent."
+          );
+        }
+
         navigate("/ticketHistory");
       } catch (error) {
         toast.error("Error adding appointment. Please try again.");
         console.error("Error adding appointment:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -459,11 +493,35 @@ const AddTicket = () => {
                         component={Link}
                         to="/"
                         sx={{ mr: 2 }}
+                        disabled={isLoading}
                       >
                         Back
                       </Button>
-                      <Button color="primary" type="submit" variant="contained">
-                        Add Appointment
+                      <Button
+                        color="primary"
+                        type="submit"
+                        variant="contained"
+                        disabled={isLoading}
+                        sx={{
+                          position: "relative",
+                          minWidth: "120px",
+                        }}
+                      >
+                        {isLoading ? (
+                          <>
+                            <CircularProgress
+                              size={24}
+                              sx={{
+                                position: "absolute",
+                                left: "50%",
+                                marginLeft: "-12px",
+                              }}
+                            />
+                            Submitting...
+                          </>
+                        ) : (
+                          "Add Appointment"
+                        )}
                       </Button>
                     </Box>
                   </form>
@@ -472,7 +530,18 @@ const AddTicket = () => {
             </Paper>
           </Container>
         </Box>
-        <ToastContainer />
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       </LocalizationProvider>
     </ThemeProvider>
   );
