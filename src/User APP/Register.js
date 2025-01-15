@@ -143,7 +143,7 @@ const Register = () => {
     const fetchCustomers = async () => {
       try {
         const res = await axios.get(
-          "https://govhub-backend-6375764a4f5c.herokuapp.com/api/customers"
+          "https://govhub-backend.onrender.com/api/customers"
         );
         setAllCustomers(res.data);
       } catch (error) {
@@ -237,12 +237,12 @@ const Register = () => {
       setLoading(true);
       try {
         const res = await axios.post(
-          "https://govhub-backend-6375764a4f5c.herokuapp.com/api/customers",
+          "https://govhub-backend.onrender.com/api/customers",
           dataToSubmit
         );
         const email = dataToSubmit.emailAddress;
         const customerRes = await axios.get(
-          `https://govhub-backend-6375764a4f5c.herokuapp.com/api/customers/email/${email}`
+          `https://govhub-backend.onrender.com/api/customers/email/${email}`
         );
         const customerData = customerRes.data;
         localStorage.setItem("customer", JSON.stringify(customerData));

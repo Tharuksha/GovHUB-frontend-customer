@@ -102,9 +102,7 @@ const ViewAppointment = () => {
 
   useEffect(() => {
     axios
-      .get(
-        `https://govhub-backend-6375764a4f5c.herokuapp.com/api/tickets/${id}`
-      )
+      .get(`https://govhub-backend.onrender.com/api/tickets/${id}`)
       .then((response) => {
         setTicket(response.data);
         setLoading(false);
@@ -122,7 +120,7 @@ const ViewAppointment = () => {
   const fetchDepartmentName = async (id) => {
     try {
       const departmentResponse = await axios.get(
-        `https://govhub-backend-6375764a4f5c.herokuapp.com/api/departments/${id}`
+        `https://govhub-backend.onrender.com/api/departments/${id}`
       );
       setDepartmentName(departmentResponse.data.departmentName);
     } catch (error) {
@@ -133,7 +131,7 @@ const ViewAppointment = () => {
   const fetchStaff = async (id) => {
     try {
       const staffResponse = await axios.get(
-        `https://govhub-backend-6375764a4f5c.herokuapp.com/api/staff/${id}`
+        `https://govhub-backend.onrender.com/api/staff/${id}`
       );
       setStaff(staffResponse.data);
     } catch (error) {

@@ -120,17 +120,10 @@ const theme = createTheme({
   },
 });
 
-const roundToNearest15 = (time) => {
-  const minutes = time.minutes();
-  const roundedMinutes = Math.round(minutes / 15) * 15;
-  return time.clone().minutes(roundedMinutes).seconds(0).milliseconds(0);
-};
-
 const AddTicket = () => {
   const customer = JSON.parse(localStorage.getItem("customer"));
   const departmentId = localStorage.getItem("departmentId");
   const [departmentData, setDepartmentData] = useState({});
-  const [operatingTime, setOperatingTime] = useState({});
   const [appointmentReasons, setAppointmentReasons] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
@@ -155,11 +148,12 @@ const AddTicket = () => {
 
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+
   useEffect(() => {
     const getDepartmentDetails = async () => {
       try {
         const res = await axios.get(
-          `https://govhub-backend-6375764a4f5c.herokuapp.com/api/departments/${departmentId}`
+          `https://govhub-backend.onrender.com/api/departments/${departmentId}`
         );
         setDepartmentData(res.data);
         setAppointmentReasons(res.data.appointmentReasons || []);
@@ -171,10 +165,6 @@ const AddTicket = () => {
     getDepartmentDetails();
   }, [departmentId]);
 
-  useEffect(() => {
-    setOperatingTime(getOperatingTimes(departmentData));
-  }, [departmentData]);
-
   const checkTimeSlotAvailability = async (date, time) => {
     if (!date || !time) return true;
 
@@ -184,7 +174,7 @@ const AddTicket = () => {
       const timeStr = moment(time).format("HH:mm");
 
       const response = await axios.post(
-        "https://govhub-backend-6375764a4f5c.herokuapp.com/api/tickets/check-availability",
+        "https://govhub-backend.onrender.com/api/tickets/check-availability",
         {
           date: dateStr,
           time: timeStr,
@@ -193,9 +183,7 @@ const AddTicket = () => {
 
       setTimeSlotAvailable(response.data.available);
       if (!response.data.available) {
-        toast.warning(
-          response.data.message || "This time slot is not available"
-        );
+        toast.warning("This slot is already booked");
       }
       return response.data.available;
     } catch (error) {
@@ -220,70 +208,11 @@ const AddTicket = () => {
 
       case "appointmentDate":
         if (!value) return "Appointment date is required";
-        const selectedDate = moment(value);
-        const today = moment().startOf("day");
-
-        if (selectedDate.isBefore(today)) {
-          return "Cannot select past dates";
-        }
-
-        const threeMonthsFromNow = moment().add(3, "months");
-        if (selectedDate.isAfter(threeMonthsFromNow)) {
-          return "Cannot book appointments more than 3 months in advance";
-        }
-
-        if (selectedDate.day() === 0 || selectedDate.day() === 6) {
-          return "Appointments cannot be scheduled on weekends";
-        }
-
         return "";
 
-      case "appointmentTime": {
+      case "appointmentTime":
         if (!value) return "Appointment time is required";
-
-        const selectedTime = moment(value);
-        const startTime = moment().set({
-          hour: 8,
-          minute: 0,
-          second: 0,
-          millisecond: 0,
-        });
-        const endTime = startTime
-          .clone()
-          .add(departmentData.operatingHours || 8, "hours");
-
-        // Check operating hours
-        if (
-          selectedTime.hour() < startTime.hour() ||
-          selectedTime.hour() >= endTime.hour()
-        ) {
-          return `Appointments must be between ${startTime.format(
-            "h:mm A"
-          )} and ${endTime.format("h:mm A")}`;
-        }
-
-        // Check if booking is at least 15 minutes from now
-        const currentTime = moment();
-        const minimumBookingTime = currentTime.clone().add(15, "minutes");
-
-        if (
-          moment(appointmentDetails.appointmentDate).isSame(
-            currentTime,
-            "day"
-          ) &&
-          selectedTime.isBefore(minimumBookingTime)
-        ) {
-          return "Appointments must be booked at least 15 minutes in advance";
-        }
-
-        // Validate that time is exactly on a 15-minute interval
-        const minutes = selectedTime.minutes();
-        if (![0, 15, 30, 45].includes(minutes)) {
-          return "Appointments must be scheduled at 15-minute intervals (00, 15, 30, 45)";
-        }
-
         return "";
-      }
 
       default:
         return "";
@@ -344,25 +273,19 @@ const AddTicket = () => {
       return;
     }
 
-    // Round the selected time to the nearest 15-minute interval
-    const roundedTime = roundToNearest15(time);
-
     setAppointmentDetails((prev) => ({
       ...prev,
-      appointmentTime: roundedTime,
+      appointmentTime: time,
     }));
 
-    if (roundedTime && appointmentDetails.appointmentDate) {
-      await checkTimeSlotAvailability(
-        appointmentDetails.appointmentDate,
-        roundedTime
-      );
+    if (time && appointmentDetails.appointmentDate) {
+      await checkTimeSlotAvailability(appointmentDetails.appointmentDate, time);
     }
 
     if (touchedFields.appointmentTime) {
       setErrors((prev) => ({
         ...prev,
-        appointmentTime: validateField("appointmentTime", roundedTime),
+        appointmentTime: validateField("appointmentTime", time),
       }));
     }
   };
@@ -420,7 +343,7 @@ const AddTicket = () => {
 
         if (!isAvailable) {
           toast.error(
-            "This time slot is no longer available. Please select another time."
+            "This slot is already booked. Please select another time."
           );
           return;
         }
@@ -433,7 +356,7 @@ const AddTicket = () => {
         };
 
         const response = await axios.post(
-          "https://govhub-backend-6375764a4f5c.herokuapp.com/api/tickets",
+          "https://govhub-backend.onrender.com/api/tickets",
           appointmentToSubmit
         );
 
@@ -449,7 +372,7 @@ const AddTicket = () => {
 
         try {
           await axios.post(
-            "https://govhub-backend-6375764a4f5c.herokuapp.com/api/email/appointment-confirmation",
+            "https://govhub-backend.onrender.com/api/email/appointment-confirmation",
             emailDetails
           );
           toast.success(
@@ -464,11 +387,7 @@ const AddTicket = () => {
 
         navigate("/ticketHistory");
       } catch (error) {
-        if (
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
+        if (error.response?.data?.message) {
           toast.error(error.response.data.message);
         } else {
           toast.error("Error adding appointment. Please try again.");
@@ -479,27 +398,6 @@ const AddTicket = () => {
       }
     }
   };
-
-  function getOperatingTimes(departmentData) {
-    const startTime = moment().set({
-      hour: 8,
-      minute: 0,
-      second: 0,
-      millisecond: 0,
-    });
-    const operatingHours = departmentData.operatingHours || 8;
-    const closeTime = startTime
-      .clone()
-      .add(operatingHours, "hours")
-      .subtract(15, "minutes");
-    const formattedStartTime = startTime.format("h:mm A");
-    const formattedCloseTime = closeTime.format("h:mm A");
-
-    return {
-      startTime: formattedStartTime,
-      closeTime: formattedCloseTime,
-    };
-  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -615,32 +513,6 @@ const AddTicket = () => {
                     </Typography>
                   </motion.div>
 
-                  <Box
-                    sx={{
-                      mb: 4,
-                      p: 2,
-                      bgcolor: alpha(theme.palette.primary.main, 0.1),
-                      borderRadius: 2,
-                    }}
-                  >
-                    <Typography
-                      variant="body1"
-                      sx={{ display: "flex", alignItems: "center" }}
-                    >
-                      <AccessTimeIcon sx={{ mr: 1 }} />
-                      Department operating hours: {
-                        operatingTime.startTime
-                      } to {operatingTime.closeTime}
-                      <Typography
-                        variant="body2"
-                        color="textSecondary"
-                        sx={{ ml: 2 }}
-                      >
-                        (Appointments available in 15-minute intervals)
-                      </Typography>
-                    </Typography>
-                  </Box>
-
                   <form onSubmit={handleSubmit}>
                     <FormControl
                       fullWidth
@@ -743,28 +615,12 @@ const AddTicket = () => {
                           }}
                         />
                       )}
-                      disablePast
-                      shouldDisableDate={(date) => {
-                        return date.day() === 0 || date.day() === 6;
-                      }}
                     />
 
                     <TimePicker
                       label="Appointment Time"
                       value={appointmentDetails.appointmentTime}
                       onChange={handleTimeChange}
-                      onAccept={(time) => {
-                        if (time) {
-                          const roundedTime = roundToNearest15(time);
-                          handleTimeChange(roundedTime);
-                        }
-                      }}
-                      onClose={() =>
-                        handleFieldBlur(
-                          "appointmentTime",
-                          appointmentDetails.appointmentTime
-                        )
-                      }
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -796,21 +652,7 @@ const AddTicket = () => {
                           }}
                         />
                       )}
-                      minTime={moment().set({ hour: 8, minute: 0 })}
-                      maxTime={moment().set({
-                        hour: 8 + (departmentData.operatingHours || 8) - 1,
-                        minute: 45,
-                      })}
-                      views={["hours", "minutes"]}
-                      ampm={false}
-                      minutesStep={15}
-                      shouldDisableTime={(timeValue, view) => {
-                        if (view === "minutes") {
-                          const minutes = timeValue.minutes();
-                          return ![0, 15, 30, 45].includes(minutes);
-                        }
-                        return false;
-                      }}
+                      ampm={true}
                     />
 
                     <Box

@@ -223,7 +223,7 @@ const TicketHistory = () => {
   const fetchData = useCallback(async () => {
     try {
       const response = await axios.get(
-        "https://govhub-backend-6375764a4f5c.herokuapp.com/api/tickets"
+        "https://govhub-backend.onrender.com/api/tickets"
       );
       const customerTickets = response.data.filter(
         (item) => item.customerID === customer._id
@@ -260,7 +260,7 @@ const TicketHistory = () => {
   const deleteTicket = async (id) => {
     try {
       await axios.delete(
-        `https://govhub-backend-6375764a4f5c.herokuapp.com/api/tickets/${id}`
+        `https://govhub-backend.onrender.com/api/tickets/${id}`
       );
       toast.success("Ticket deleted successfully!");
       fetchData();
